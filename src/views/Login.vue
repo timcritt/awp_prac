@@ -1,22 +1,46 @@
+<script setup>
+import { ref } from "vue";
+import { useSessionStore } from "@/stores/session";
+import { storeToRefs } from "pinia";
+
+const sessionStore = useSessionStore();
+
+// Extract the login function from the session store
+const { login } = sessionStore;
+
+//locally stored login details entered by user
+const username = ref("");
+const password = ref("");
+
+const handleLogin = () => {
+	if (username.value && password.value) {
+		//Pass the values, not the refs, to the login function
+		login(username.value, password.value);
+	}
+};
+</script>
+
 <template>
-	<div class="login">
-		<h1>Login</h1>
-		<form @submit.prevent="handleLogin"></form>
-	</div>
+	<main class="login">
+		<form class="input-group" @submit.prevent="handleLogin">
+			<label for="username">Username:</label>
+			<input type="text" placeholder="Username" v-model="username" required />
+			<label for="password">Password:</label>
+			<input
+				type="password"
+				placeholder="Password"
+				v-model="password"
+				required
+			/>
+			<button class="btn btn--cta" @click="handleLogin">Login</button>
+		</form>
+	</main>
 </template>
 
-<script setup></script>
-
 <style scoped>
-.login {
-	max-width: 400px;
-	margin: 2rem auto;
-	padding: 2rem;
-	border: 1px solid #ccc;
-	border-radius: 8px;
-}
-.error {
-	color: red;
-	margin-top: 1rem;
+form {
+	display: grid;
+	place-items: center;
+	gap: 20px;
 }
 </style>
