@@ -1,4 +1,15 @@
-<script setup></script>
+<script setup>
+import { onMounted } from "vue";
+import { useSessionStore } from "@/stores/session";
+
+const session = useSessionStore();
+
+//call the initSession method when the component is mounted
+// This initializes the session, checking for any existing user session data
+onMounted(() => {
+	session.initSession();
+});
+</script>
 
 <template>
 	<main class="main">

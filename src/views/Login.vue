@@ -1,21 +1,33 @@
 <script setup>
 import { ref } from "vue";
 import { useSessionStore } from "@/stores/session";
+import { useRouter } from "vue-router";
 import { storeToRefs } from "pinia";
 
 const sessionStore = useSessionStore();
+const router = useRouter();
 
 // Extract the login function from the session store
-const { login } = sessionStore;
+const { login, addErrors } = sessionStore;
+// reactive variables must be extracted with storeToRefs to avoid losing reactivity
+const isAuthenticated = storeToRefs(sessionStore.isAuthenticated);
 
-//locally stored login details entered by user
+//login details entered by user
 const username = ref("");
 const password = ref("");
 
-const handleLogin = () => {
+const handleLogin = async () => {
 	if (username.value && password.value) {
 		//Pass the values, not the refs, to the login function
-		login(username.value, password.value);
+		await login(username.value, password.value);
+
+		// Check if the user is authenticated after login
+		if (isAuthenticated) {
+			// Redirect to the home page after successful login
+			router.push("/");
+		} else {
+			addErrors("Invalid username or password. Please try again.");
+		}
 	}
 };
 </script>
