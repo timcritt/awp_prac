@@ -44,8 +44,11 @@ export async function login(username, password) {
 			surname: user.surname,
 		};
 	} catch (err) {
-		console.error("Login failed:", err.response?.data || err.message);
-		throw new Error(err.response?.data?.message || "Login failed");
+		clearAuthHeader();
+
+		const message =
+			err.response?.data?.message || err.message || "Login failed";
+		throw new Error(message);
 	}
 }
 
@@ -54,7 +57,7 @@ export async function fetchUser(username) {
 		const res = await authAxios.get(`/user/${username}`);
 		return { name: res.data.name, surname: res.data.surname };
 	} catch (err) {
-		console.error(
+		console.log(
 			`Failed to fetch user ${username}:`,
 			err.response?.data || err.message
 		);

@@ -8,9 +8,10 @@ const sessionStore = useSessionStore();
 const router = useRouter();
 
 // Extract the login function from the session store
-const { login, addErrors } = sessionStore;
+const { login, logout } = sessionStore;
 // reactive variables must be extracted with storeToRefs to avoid losing reactivity
-const isAuthenticated = storeToRefs(sessionStore.isAuthenticated);
+const { errors } = storeToRefs(sessionStore);
+const { isAuthenticated } = storeToRefs(sessionStore);
 
 //login details entered by user
 const username = ref("");
@@ -20,13 +21,11 @@ const handleLogin = async () => {
 	if (username.value && password.value) {
 		//Pass the values, not the refs, to the login function
 		await login(username.value, password.value);
-
+		console.log(isAuthenticated.value);
 		// Check if the user is authenticated after login
-		if (isAuthenticated) {
+		if (isAuthenticated.value) {
 			// Redirect to the home page after successful login
 			router.push("/");
-		} else {
-			addErrors("Invalid username or password. Please try again.");
 		}
 	}
 };
@@ -46,6 +45,11 @@ const handleLogin = async () => {
 			/>
 			<button class="btn btn--cta" @click="handleLogin">Login</button>
 		</form>
+		<!-- Display errors if any -->
+		<div v-if="errors.length" class="error-messages">
+			<p v-for="(error, index) in errors" :key="index">{{ error }}</p>
+		</div>
+		<button @click="logout">Logout</button>
 	</main>
 </template>
 
@@ -54,5 +58,9 @@ form {
 	display: grid;
 	place-items: center;
 	gap: 20px;
+}
+
+.error-messages {
+	color: red;
 }
 </style>
