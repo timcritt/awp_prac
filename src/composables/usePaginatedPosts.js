@@ -1,5 +1,7 @@
 import { ref, computed } from "vue";
 
+//Encapsulates the logic for fetching paginated posts
+
 export function usePaginatedPosts(fetchFunction, fetchArgs = []) {
 	const messages = ref([]);
 	//Could be extended to accept custom limit, but PRAC specifies limit=10 for all views that consume the composabl

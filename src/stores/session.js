@@ -26,15 +26,15 @@ export const useSessionStore = defineStore("session-store", () => {
 			addErrors(err.message || "Login failed");
 			return;
 		}
-		console.log("Login successful with token:", sessionData);
+		// console.log("Login successful with token:", sessionData);
 		setToken(sessionData.token);
 		setUsername(sessionData.username);
 		setName(sessionData.name);
 		setSurname(sessionData.surname);
 	}
 
-	// Retrieve user data based on the current username. Token has already been assigned to authService by login
-	// Called to populate name and surname when reusing an existing session token after page refresh.
+	// Retrieve user data based on the current username.
+	// Called to fetch populate name and surname in local state when reusing an existing session token after page refresh.
 	async function fetchUser() {
 		if (!username.value) return;
 		const { name, surname } = await authService.fetchUser(username.value);

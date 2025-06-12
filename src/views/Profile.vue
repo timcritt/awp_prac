@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, computed } from "vue";
+import { ref, onMounted } from "vue";
 import { useRoute } from "vue-router";
 import { fetchPostsByUsername } from "@/services/post-service";
 import { usePaginatedPosts } from "@/composables/usePaginatedPosts";

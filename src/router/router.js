@@ -35,7 +35,7 @@ const router = createRouter({
 	routes,
 });
 
-// Nabigation guard to check authentication
+// Navigation guard to check authentication and redirect if necessary
 router.beforeEach((to, from, next) => {
 	const sessionStore = useSessionStore();
 	const isAuthenticated = sessionStore.isAuthenticated;
