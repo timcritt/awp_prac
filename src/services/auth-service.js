@@ -27,6 +27,7 @@ function setupAuthInterceptor(onUnauthorized) {
 }
 
 export async function login(username, password) {
+	clearAuthHeader();
 	try {
 		const res = await authAxios.post("/login", { username, password });
 
@@ -35,7 +36,7 @@ export async function login(username, password) {
 		localStorage.setItem("token", token);
 		localStorage.setItem("username", user.username);
 		setAuthHeader(token);
-		console.log("Login successful:");
+		// console.log("Login successful:");
 
 		return {
 			token,
@@ -56,10 +57,10 @@ export async function fetchUser(username) {
 		const res = await authAxios.get(`/user/${username}`);
 		return { name: res.data.name, surname: res.data.surname };
 	} catch (err) {
-		console.log(
-			`Failed to fetch user ${username}:`,
-			err.response?.data || err.message
-		);
+		// console.log(
+		// 	`Failed to fetch user ${username}:`,
+		// 	err.response?.data || err.message
+		// );
 		throw new Error(err.response?.data?.message || "Unable to fetch user");
 	}
 }
@@ -69,8 +70,8 @@ export function restoreAuth() {
 	const username = localStorage.getItem("username");
 
 	if (token && username) {
-		console.log("Restoring authentication for user:", username);
-		console.log("Restoring authentication with Token:", token);
+		// console.log("Restoring authentication for user:", username);
+		// console.log("Restoring authentication with Token:", token);
 		setAuthHeader(token);
 		return { token, username };
 	}

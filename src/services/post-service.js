@@ -6,6 +6,10 @@ export const fetchPostsByUsername = async (
 	limit = 10,
 	username
 ) => {
+	console.log(
+		"Token from post-service: ",
+		authAxios.defaults.headers.common["Authorization"]
+	);
 	try {
 		const response = await authAxios.get(`/user/${username}/posts`, {
 			params: { offset, limit },

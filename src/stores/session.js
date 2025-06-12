@@ -8,18 +8,14 @@ export const useSessionStore = defineStore("session-store", () => {
 	const name = ref(null);
 	const surname = ref(null);
 	const errors = ref([]);
-	console.log(errors);
 
 	// Update automatically when token changes. Pass this to components to check auth status.
 	const isAuthenticated = computed(() => {
-		console.log("Checking authetication token");
 		return !!token.value;
 	});
 
 	// Login with username and password.
 	async function login(usernameInput, password) {
-		console.log("Attempting login with username:", usernameInput);
-
 		clearErrors();
 		let sessionData;
 		try {
@@ -30,7 +26,7 @@ export const useSessionStore = defineStore("session-store", () => {
 			addErrors(err.message || "Login failed");
 			return;
 		}
-
+		console.log("Login successful with token:", sessionData);
 		setToken(sessionData.token);
 		setUsername(sessionData.username);
 		setName(sessionData.name);
@@ -48,9 +44,9 @@ export const useSessionStore = defineStore("session-store", () => {
 
 	// Initialize session from local storage
 	async function initSession() {
-		console.log(
-			"Attempting to reinitialise session from stored credentials..."
-		);
+		// console.log(
+		// 	"Attempting to reinitialise session from stored credentials..."
+		// );
 		const session = authService.restoreAuth();
 		if (!session) {
 			console.log("No session found in local storage.");

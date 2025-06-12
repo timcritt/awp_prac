@@ -24,7 +24,7 @@ const handleLogin = async () => {
 	if (username.value && password.value) {
 		//Pass the values, not the refs, to the login function
 		await login(username.value, password.value);
-		console.log(isAuthenticated.value);
+
 		// Check if the user is authenticated after login
 		if (isAuthenticated.value) {
 			// Redirect to the profile page of the user after successful login
@@ -46,7 +46,7 @@ const handleLogin = async () => {
 				v-model="password"
 				required
 			/>
-			<button class="btn btn--cta" @click="handleLogin">Login</button>
+			<button class="btn btn--cta">Login</button>
 		</form>
 		<!-- Display errors if any -->
 		<div v-if="errors.length" class="error-messages">
