@@ -2,11 +2,11 @@
 import { ref, onMounted, computed } from "vue";
 import { useRoute } from "vue-router";
 import { fetchPostsByUsername } from "@/services/post-service";
+import { usePaginatedPosts } from "@/composables/usePaginatedPosts";
 
 const route = useRoute();
 const username = route.params.username;
 
-const messages = ref([]);
 // Offset for pagination, starting at 0
 const offset = ref(0);
 //Request posts in groups of 10
@@ -14,34 +14,14 @@ const limit = 10;
 // Track the total number of posts so we know when to deactivate the "Load more" button
 const total = ref(0);
 
-const loading = ref(true);
-const error = ref(null);
+//Use a composable to handle pagination logic. Pass in the fetch function and parameters
+const { messages, loading, error, canLoadMore, fetchPosts } = usePaginatedPosts(
+	fetchPostsByUsername,
+	[username]
+);
 
-// Compute if there are more posts to load
-const canLoadMore = computed(() => messages.value.length < total.value);
-
-const fetchPostsWithPagination = async () => {
-	loading.value = true;
-	try {
-		const { paginator, result } = await fetchPostsByUsername(
-			offset.value,
-			limit,
-			username
-		);
-		//Append posts to the existing messages array to allow for new posts to be added below existing ones
-		messages.value.push(...result);
-		total.value = paginator.total;
-		// This allows us to keep track of how many posts have been loaded so far
-		offset.value += limit;
-	} catch (err) {
-		error.value = err.message || "An error occurred while fetching posts.";
-		console.error("Error loading posts:", err);
-	} finally {
-		loading.value = false;
-	}
-};
-
-onMounted(fetchPostsWithPagination);
+//Call
+onMounted(fetchPosts);
 </script>
 
 <template>
@@ -68,11 +48,7 @@ onMounted(fetchPostsWithPagination);
 			<p v-if="messages.length === 0">No posts found.</p>
 
 			<!-- Load more button -->
-			<button
-				v-if="canLoadMore"
-				@click="fetchPostsWithPagination"
-				:disabled="loading"
-			>
+			<button v-if="canLoadMore" @click="fetchPosts" :disabled="loading">
 				{{ loading ? "Loading..." : "Load more posts" }}
 			</button>
 			<p v-else>No more posts to load.</p>
