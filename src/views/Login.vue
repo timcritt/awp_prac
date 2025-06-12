@@ -10,8 +10,11 @@ const router = useRouter();
 // Extract the login function from the session store
 const { login, logout } = sessionStore;
 // reactive variables must be extracted with storeToRefs to avoid losing reactivity
-const { errors } = storeToRefs(sessionStore);
-const { isAuthenticated } = storeToRefs(sessionStore);
+const {
+	errors,
+	isAuthenticated,
+	username: storeUsername,
+} = storeToRefs(sessionStore);
 
 //login details entered by user
 const username = ref("");
@@ -24,8 +27,8 @@ const handleLogin = async () => {
 		console.log(isAuthenticated.value);
 		// Check if the user is authenticated after login
 		if (isAuthenticated.value) {
-			// Redirect to the home page after successful login
-			router.push("/");
+			// Redirect to the profile page of the user after successful login
+			router.push(`/profile/${storeUsername.value}`);
 		}
 	}
 };
