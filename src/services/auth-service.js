@@ -46,8 +46,7 @@ export async function login(username, password) {
 	} catch (err) {
 		clearAuthHeader();
 
-		const message =
-			err.response?.data?.message || err.message || "Login failed";
+		const message = err.message || "Login failed";
 		throw new Error(message);
 	}
 }

@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { ref, computed, reactive } from "vue";
+import { ref, computed } from "vue";
 import * as authService from "@/services/auth-service";
 
 export const useSessionStore = defineStore("session-store", () => {
@@ -12,15 +12,15 @@ export const useSessionStore = defineStore("session-store", () => {
 
 	// Update automatically when token changes. Pass this to components to check auth status.
 	const isAuthenticated = computed(() => {
-		console.log("Checking authentication status...");
+		console.log("Checking authetication token");
 		return !!token.value;
 	});
 
 	// Login with username and password.
 	async function login(usernameInput, password) {
 		console.log("Attempting login with username:", usernameInput);
-		// Clear any previous errors
-		errors.value = [];
+
+		clearErrors();
 		let sessionData;
 		try {
 			sessionData = await authService.login(usernameInput, password);
@@ -31,15 +31,19 @@ export const useSessionStore = defineStore("session-store", () => {
 			return;
 		}
 
-		setSession(sessionData);
+		setToken(sessionData.token);
+		setUsername(sessionData.username);
+		setName(sessionData.name);
+		setSurname(sessionData.surname);
 	}
 
-	// Retrieve user data based on the current username.
+	// Retrieve user data based on the current username. Token has already been assigned to authService by login
 	// Called to populate name and surname when reusing an existing session token after page refresh.
 	async function fetchUser() {
 		if (!username.value) return;
-		const userData = await authService.fetchUser(username.value);
-		setUser(userData);
+		const { name, surname } = await authService.fetchUser(username.value);
+		setName(name);
+		setSurname(surname);
 	}
 
 	// Initialize session from local storage
@@ -53,7 +57,8 @@ export const useSessionStore = defineStore("session-store", () => {
 			return;
 		}
 
-		setSession(session);
+		setToken(session.token);
+		setUsername(session.username);
 
 		// Setup interceptor to clear session on 401 (token has expired or is invalid)
 		authService.setupAuthInterceptor(() => {
@@ -76,20 +81,17 @@ export const useSessionStore = defineStore("session-store", () => {
 	}
 
 	// Setters for mutating state
-	function setSession({
-		token: t,
-		username: u,
-		name: n = null,
-		surname: s = null,
-	}) {
-		token.value = t;
-		username.value = u;
-		name.value = n;
-		surname.value = s;
-	}
 
-	function setUser({ name: n, surname: s }) {
+	function setUsername(u) {
+		username.value = u;
+	}
+	function setToken(t) {
+		token.value = t;
+	}
+	function setName(n) {
 		name.value = n;
+	}
+	function setSurname(s) {
 		surname.value = s;
 	}
 
@@ -98,6 +100,9 @@ export const useSessionStore = defineStore("session-store", () => {
 		username.value = null;
 		name.value = null;
 		surname.value = null;
+	}
+	function clearErrors() {
+		errors.value = [];
 	}
 
 	function addErrors(newErrors) {
