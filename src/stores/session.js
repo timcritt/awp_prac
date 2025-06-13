@@ -1,6 +1,7 @@
 import { defineStore } from "pinia";
 import { ref, computed } from "vue";
 import * as authService from "@/services/auth-service";
+import * as userService from "@/services/user-service";
 
 export const useSessionStore = defineStore("session-store", () => {
 	const token = ref(null);
@@ -8,6 +9,7 @@ export const useSessionStore = defineStore("session-store", () => {
 	const name = ref(null);
 	const surname = ref(null);
 	const errors = ref([]);
+	const profileImg = ref(null);
 
 	// Update automatically when token changes. Pass this to components to check auth status.
 	const isAuthenticated = computed(() => {
@@ -26,20 +28,29 @@ export const useSessionStore = defineStore("session-store", () => {
 			addErrors(err.message || "Login failed");
 			return;
 		}
+
 		// console.log("Login successful with token:", sessionData);
 		setToken(sessionData.token);
 		setUsername(sessionData.username);
 		setName(sessionData.name);
 		setSurname(sessionData.surname);
+		setProfileImg(sessionData.profileImg);
+
+		// Setup interceptor to clear session on 401 (token has expired or is invalid)
+		authService.setupAuthInterceptor(() => {
+			clearSession();
+		});
 	}
 
 	// Retrieve user data based on the current username.
 	// Called to fetch populate name and surname in local state when reusing an existing session token after page refresh.
 	async function fetchUser() {
 		if (!username.value) return;
-		const { name, surname } = await authService.fetchUser(username.value);
-		setName(name);
-		setSurname(surname);
+		const userData = await userService.fetchUser(username.value);
+		console.log("Fetched user data:", userData);
+		setProfileImg(userData.profileImg);
+		setName(userData.name);
+		setSurname(userData.surname);
 	}
 
 	// Initialize session from local storage
@@ -90,12 +101,16 @@ export const useSessionStore = defineStore("session-store", () => {
 	function setSurname(s) {
 		surname.value = s;
 	}
+	function setProfileImg(img) {
+		profileImg.value = img;
+	}
 
 	function clearSession() {
 		token.value = null;
 		username.value = null;
 		name.value = null;
 		surname.value = null;
+		profileImg.value = null;
 	}
 	function clearErrors() {
 		errors.value = [];
@@ -112,6 +127,7 @@ export const useSessionStore = defineStore("session-store", () => {
 		surname,
 		isAuthenticated,
 		errors,
+		profileImg,
 		login,
 		logout,
 		initSession,

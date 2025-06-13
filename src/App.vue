@@ -1,6 +1,8 @@
 <script setup>
 import { onMounted } from "vue";
 import { useSessionStore } from "@/stores/session";
+import Header from "@/components/Header.vue";
+import Footer from "@/components/Footer.vue";
 
 const session = useSessionStore();
 
@@ -12,6 +14,7 @@ onMounted(() => {
 </script>
 
 <template>
+	<Header> </Header>
 	<main class="main">
 		<nav>
 			<router-link to="/">Home</router-link>
@@ -23,6 +26,7 @@ onMounted(() => {
 		<!-- Router view for displaying components based on the current route -->
 		<router-view />
 	</main>
+	<Footer></Footer>
 </template>
 
 <style scoped>

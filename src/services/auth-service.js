@@ -9,8 +9,9 @@ function clearAuthHeader() {
 	delete authAxios.defaults.headers.common["Authorization"];
 }
 
-function setupAuthInterceptor(onUnauthorized) {
-	//Invert the dependency by passing the callback
+// This function is needed to set up an interceptor for handling 401 Unauthorized responses.
+export function setupAuthInterceptor(onUnauthorized) {
+	//Call the interceptor only once.
 	if (authAxios._hasAuthInterceptor) return;
 
 	authAxios.interceptors.response.use(
@@ -27,6 +28,7 @@ function setupAuthInterceptor(onUnauthorized) {
 }
 
 export async function login(username, password) {
+	//Clear the token from the header before making a new
 	clearAuthHeader();
 	try {
 		const res = await authAxios.post("/login", { username, password });
@@ -43,6 +45,7 @@ export async function login(username, password) {
 			username: user.username,
 			name: user.name,
 			surname: user.surname,
+			profileImg: user.profileImg,
 		};
 	} catch (err) {
 		clearAuthHeader();
@@ -84,5 +87,3 @@ export function clearAuth() {
 	localStorage.removeItem("username");
 	clearAuthHeader();
 }
-
-export { setupAuthInterceptor };

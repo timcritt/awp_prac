@@ -3,15 +3,15 @@ import { ref, computed } from "vue";
 //Encapsulates the logic for fetching paginated posts
 
 export function usePaginatedPosts(fetchFunction, fetchArgs = []) {
-	const messages = ref([]);
+	const posts = ref([]);
 	//Could be extended to accept custom limit, but PRAC specifies limit=10 for all views that consume the composabl
 	const offset = ref(0);
 	const limit = 10;
 	const total = ref(0);
 	const loading = ref(false);
-	const error = ref(null);
+	const error = ref("");
 
-	const canLoadMore = computed(() => messages.value.length < total.value);
+	const canLoadMore = computed(() => posts.value.length < total.value);
 
 	const fetchPosts = async () => {
 		loading.value = true;
@@ -22,7 +22,7 @@ export function usePaginatedPosts(fetchFunction, fetchArgs = []) {
 				//spread the fetchArgs to allow for additional parameters
 				...fetchArgs
 			);
-			messages.value.push(...result);
+			posts.value.push(...result);
 			total.value = paginator.total;
 			offset.value += limit;
 		} catch (err) {
@@ -33,7 +33,7 @@ export function usePaginatedPosts(fetchFunction, fetchArgs = []) {
 	};
 
 	return {
-		messages,
+		posts,
 		loading,
 		error,
 		canLoadMore,

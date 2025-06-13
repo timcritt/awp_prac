@@ -1,58 +1,66 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import { useRoute } from "vue-router";
+
+// Import fetch function and pagination composable for fetching posts
 import { fetchPostsByUsername } from "@/services/post-service";
 import { usePaginatedPosts } from "@/composables/usePaginatedPosts";
 
+// Custom components
+import PostList from "../components/PostList.vue";
+
+// Global authentication store
+import { useSessionStore } from "@/stores/session";
+
+// Import user service to fetch user data associated with the profile
+import { fetchUser } from "@/services/user-service";
+
+const sessionStore = useSessionStore();
+
+// Logout function to clear session and redirect to login
+const { logout } = sessionStore;
+
 const route = useRoute();
-const username = route.params.username;
+const profileUsername = route.params.username;
 
-// Offset for pagination, starting at 0
-const offset = ref(0);
-//Request posts in groups of 10
-const limit = 10;
-// Track the total number of posts so we know when to deactivate the "Load more" button
-const total = ref(0);
+const userData = ref(null);
 
-//Use a composable to handle pagination logic. Pass in the fetch function and parameters
-const { messages, loading, error, canLoadMore, fetchPosts } = usePaginatedPosts(
+// Fetch posts associated with the profile username
+const { posts, loading, error, canLoadMore, fetchPosts } = usePaginatedPosts(
 	fetchPostsByUsername,
-	[username]
+	[profileUsername]
 );
 
-//Call
-onMounted(fetchPosts);
+onMounted(async () => {
+	userData.value = await fetchUser(profileUsername);
+	console.log("User fetched:", userData);
+	await fetchPosts();
+	console.log("Posts fetched:", posts);
+});
 </script>
 
 <template>
 	<div class="profile">
-		<h1>Profile Page</h1>
-		<p>
-			Posts by <strong>{{ route.params.username }}</strong
-			>:
-		</p>
+		<div v-if="userData" class="user-info">
+			<img
+				class="user-info__avatar"
+				:src="userData.profileImg"
+				alt="User Avatar"
+			/>
+			<p>{{ userData.name }} {{ userData.surname }}</p>
+			<p>@{{ userData.username }}</p>
+			<p>{{ userData.bio }}</p>
+			<p>
+				Joined in <time>{{ userData.registrationDate }}</time>
+			</p>
 
-		<div v-if="loading && messages.length === 0">Loading...</div>
-		<div v-else-if="error">{{ error }}</div>
-
-		<div v-else>
-			<ul>
-				<li v-for="msg in messages" :key="msg.id">
-					<p>
-						<strong>{{ msg.publishDate }}</strong>
-					</p>
-					<p>{{ msg.content }}</p>
-				</li>
-			</ul>
-
-			<p v-if="messages.length === 0">No posts found.</p>
-
-			<!-- Load more button -->
-			<button v-if="canLoadMore" @click="fetchPosts" :disabled="loading">
-				{{ loading ? "Loading..." : "Load more posts" }}
-			</button>
-			<p v-else>No more posts to load.</p>
+			<button class="btn--logout" @click="logout">Logout</button>
 		</div>
+
+		<PostList :posts :loading :canLoadMore :error :fetchPosts />
+
+		<div v-if="loading && posts.length === 0">Loading...</div>
+		<div v-else-if="error">{{ error }}</div>
 	</div>
 </template>
 
