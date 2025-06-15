@@ -4,6 +4,7 @@ import Login from "@/views/Login.vue";
 import Profile from "@/views/Profile.vue";
 import PostDetail from "@/views/PostDetail.vue";
 import PostForm from "@/views/PostForm.vue";
+import ReplyForm from "@/views/ReplyForm.vue";
 import { ROUTES } from "@/router/route-definitions";
 
 import { useSessionStore } from "@/stores/session";
@@ -15,6 +16,12 @@ const routes = [
 		path: ROUTES.POST_FORM().path,
 		name: ROUTES.POST_FORM().name,
 		component: PostForm,
+		meta: { requiresAuth: true },
+	},
+	{
+		path: ROUTES.REPLY_FORM().path,
+		name: ROUTES.REPLY_FORM().name,
+		component: ReplyForm,
 		meta: { requiresAuth: true },
 	},
 	{

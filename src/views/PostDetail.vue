@@ -11,7 +11,7 @@ import { ROUTES } from "@/router/route-definitions";
 
 const route = useRoute();
 const sessionStore = useSessionStore();
-const { username } = storeToRefs(sessionStore);
+const { username, isAuthenticated } = storeToRefs(sessionStore);
 
 const id = computed(() => Number(route.params.id));
 
@@ -42,6 +42,14 @@ async function handleClickEditPost() {
 	// Redirect to form page, passing the post ID
 	router.push(ROUTES.POST_FORM(id.value).to);
 }
+
+async function handleClickReply() {
+	// Redirect to reply form, passing the post ID
+	router.push(ROUTES.REPLY_FORM(id.value).to);
+}
+function handleClickEditReply(replyId) {
+	router.push(ROUTES.REPLY_FORM(id.value, replyId).to);
+}
 </script>
 
 <template>
@@ -60,13 +68,29 @@ async function handleClickEditPost() {
 			:nReplies="post.nReplies"
 		/>
 	</div>
-	<div v-if="post?.user?.username === username" class="actions-wrapper">
-		<a @click="handleDeletePost" class="btn btn--cta btn--circle">{{
-			ICONS.delete
-		}}</a>
-		<a @click="handleClickEditPost" class="btn btn--cta btn--circle">{{
-			ICONS.edit
-		}}</a>
+
+	<div class="actions-wrapper">
+		<!-- Only authenticated users who own the post can delete -->
+		<a
+			v-if="post?.user?.username === username"
+			@click="handleDeletePost"
+			class="btn btn--cta btn--circle"
+			>{{ ICONS.delete }}</a
+		>
+		<!-- Only authenticated users who own the post can edit -->
+		<a
+			v-if="post?.user?.username === username"
+			@click="handleClickEditPost"
+			class="btn btn--cta btn--circle"
+			>{{ ICONS.edit }}</a
+		>
+		<!-- All authenticated users can reply to the post. The route is already guarded, but better to check here too -->
+		<a
+			v-if="isAuthenticated"
+			@click="handleClickReply"
+			class="btn btn--cta btn--circle"
+			>{{ ICONS.comment }}</a
+		>
 	</div>
 
 	<!-- The replies associated with the post -->

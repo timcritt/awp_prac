@@ -78,6 +78,17 @@ function handleNavigateToPostDetail() {
 		router.push(ROUTES.POST_DETAIL(props.id).to);
 	}
 }
+
+//Simply using toString() added an unwanted comma, so we format the date manually
+const formattedPublishDate = computed(() => {
+	const date = new Date(props.publishDate);
+	const day = date.getDate();
+	const month = date.getMonth();
+	const year = date.getFullYear();
+	const hour = date.getHours().toString().padStart(2, "0");
+	const minute = date.getMinutes().toString().padStart(2, "0");
+	return `${day}/${month}/${year} ${hour}:${minute}`;
+});
 </script>
 
 <template>
@@ -86,12 +97,14 @@ function handleNavigateToPostDetail() {
 			<img v-if="avatar" :src="avatar" alt="avatar" class="user-info__avatar" />
 			<div class="user-info__user">
 				<h2 v-if="name">{{ name }} {{ surname }}</h2>
-				<p v-if="username">@{{ username }}</p>
+				<p class="has-color-grey has-text-small" v-if="username">
+					@{{ username }}
+				</p>
 			</div>
 		</section>
 		<section class="post-detail" @click="handleNavigateToPostDetail">
-			<p>{{ content }}</p>
-			<time>{{ new Date(publishDate).toLocaleString() }}</time>
+			<p class="has-color-grey">{{ content }}</p>
+			<time class="has-color-light">{{ formattedPublishDate }}</time>
 		</section>
 		<section v-if="{}" class="interactions" @click="handleNavigateToPostDetail">
 			<p>{{ ICONS.heart }} {{ nLikes }}</p>

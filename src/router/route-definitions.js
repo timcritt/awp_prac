@@ -22,8 +22,18 @@ export const ROUTES = {
 	// If Id is passed, page will be rendered in edit mode, otherwise in create mode
 	POST_FORM: (id = null) => ({
 		name: "PostForm",
-		path: `/post/form/:id?`, // keep original definition for the router
+		path: `/post/form/:id?`,
 		to:
 			id != null ? { name: "PostForm", params: { id } } : { name: "PostForm" },
+	}),
+
+	//Replies currently only support creation, not editing. But this can be extended in the future.
+	REPLY_FORM: (postId, replyId = null) => ({
+		name: "ReplyForm",
+		path: `/post/:postId/reply/form/:id?`,
+		to:
+			replyId != null
+				? { name: "ReplyForm", params: { postId, id: replyId } }
+				: { name: "ReplyForm", params: { postId } },
 	}),
 };
