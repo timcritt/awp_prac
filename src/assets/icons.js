@@ -4,7 +4,7 @@ export const ICONS = {
 	comment: "💬",
 	delete: "🗑",
 	edit: "✎",
-	exit: "𓉞",
+	logout: "𓉞",
 	login: "🗣",
 	home: "🏠︎",
 };

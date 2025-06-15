@@ -2,16 +2,14 @@
 import { authAxios } from "@/services/auth-axios";
 import { publicAxios } from "@/services/public-axios";
 
+// Fetch posts by a specific username with pagination support
 export const fetchPostsByUsername = async (
 	offset = 0,
 	limit = 10,
 	username
 ) => {
-	console.log(
-		"Token from post-service: ",
-		authAxios.defaults.headers.common["Authorization"]
-	);
 	try {
+		// Authenticated request to fetch posts by username
 		const response = await authAxios.get(`/user/${username}/posts`, {
 			params: { offset, limit },
 		});
@@ -25,18 +23,65 @@ export const fetchPostsByUsername = async (
 	}
 };
 
+// Fetch a single post by its ID
+export const fetchPostById = async (id) => {
+	try {
+		// Authenticated request to fetch a post by its ID
+		const response = await authAxios.get(`/post/${id}`);
+		return response.data;
+	} catch (error) {
+		throw error;
+	}
+};
+
+// Fetch all posts with pagination support
 export const fetchAllPosts = async (offset = 0, limit = 10) => {
 	try {
+		// Public request to fetch all posts
 		const response = await publicAxios.get("/posts", {
 			params: { offset, limit },
 		});
-		console.log(response.data);
 
 		const { paginator, result } = response.data;
 
 		return { paginator, result };
 	} catch (error) {
 		console.error("Error fetching all posts:", error);
+		throw error;
+	}
+};
+
+// Delete a post by its ID
+export const deletePostById = async (id) => {
+	try {
+		// Authenticated request to delete a post by its ID
+		const response = await authAxios.delete(`/post/${id}`);
+		return response.data;
+	} catch (error) {
+		console.error("Error deleting post:", error);
+		throw error;
+	}
+};
+
+// Create a new post and return its ID
+export const createPost = async (content) => {
+	try {
+		// Authenticated request to create a new post
+		const response = await authAxios.post("/post", { content });
+		return response.data.id; // Return the ID of the created post
+	} catch (error) {
+		console.error("Error creating post:", error);
+		throw error;
+	}
+};
+
+// Update an existing post by its ID
+export const updatePost = async (id, content) => {
+	try {
+		// Authenticated request to update an existing post
+		await authAxios.put(`/post/${id}`, { content });
+	} catch (error) {
+		console.error("Error updating post:", error);
 		throw error;
 	}
 };

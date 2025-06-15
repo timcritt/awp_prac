@@ -4,27 +4,28 @@ import Login from "@/views/Login.vue";
 import Profile from "@/views/Profile.vue";
 import PostDetail from "@/views/PostDetail.vue";
 import PostForm from "@/views/PostForm.vue";
+import { ROUTES } from "@/router/route-definitions";
 
 import { useSessionStore } from "@/stores/session";
 
 const routes = [
-	{ path: "/", name: "Home", component: Home },
-	{ path: "/login", name: "Login", component: Login },
+	{ path: ROUTES.HOME.path, name: ROUTES.HOME.name, component: Home },
+	{ path: ROUTES.LOGIN.path, name: ROUTES.LOGIN.name, component: Login },
 	{
-		path: "/post/form/:id?",
-		name: "PostForm",
+		path: ROUTES.POST_FORM().path,
+		name: ROUTES.POST_FORM().name,
 		component: PostForm,
 		meta: { requiresAuth: true },
 	},
 	{
-		path: "/post/:id",
-		name: "PostDetail",
+		path: ROUTES.POST_DETAIL().path,
+		name: ROUTES.POST_DETAIL().name,
 		component: PostDetail,
 		meta: { requiresAuth: true },
 	},
 	{
-		path: "/profile/:username",
-		name: "Profile",
+		path: ROUTES.PROFILE().path,
+		name: ROUTES.PROFILE().name,
 		component: Profile,
 		meta: { requiresAuth: true },
 	},

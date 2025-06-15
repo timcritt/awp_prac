@@ -2,6 +2,7 @@
 import { useSessionStore } from "@/stores/session";
 import { toRefs } from "vue";
 import { ICONS } from "@/assets/icons";
+import { ROUTES } from "@/router/route-definitions";
 
 const session = useSessionStore();
 const { profileImg, username, isAuthenticated } = toRefs(session);
@@ -10,26 +11,27 @@ const { profileImg, username, isAuthenticated } = toRefs(session);
 	<footer class="footer">
 		<nav class="menu">
 			<router-link
-				to="/"
+				:to="ROUTES.HOME.to"
 				class="menu-link"
 				:class="{ active: $route.path === '/' }"
-				href="/	"
 			>
 				{{ ICONS.home }}
 			</router-link>
 			<router-link
-				:to="`/profile/${username}`"
+				v-if="isAuthenticated && username"
+				:to="ROUTES.PROFILE(username).to"
 				class="menu-link"
-				:class="{ active: $route.path === '/login' }"
-				href="/login"
+				:class="{ active: $route.name === 'Profile' }"
 			>
-				<img
-					v-if="isAuthenticated"
-					:src="profileImg"
-					alt="Profile Image"
-					class="profile-img"
-				/>
-				<span v-else>{{ ICONS.login }}</span>
+				<img :src="profileImg" alt="Profile Image" class="profile-img" />
+			</router-link>
+			<router-link
+				v-else
+				:to="ROUTES.LOGIN.to"
+				class="menu-link"
+				:class="{ active: $route.name === 'Login' }"
+			>
+				<span>{{ ICONS.login }}</span>
 			</router-link>
 		</nav>
 	</footer>

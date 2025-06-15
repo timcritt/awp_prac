@@ -192,7 +192,7 @@ input,
 select,
 textarea {
 	outline: none;
-	background-color: #f0f6f9; /*added by Tim*/
+	/* background-color: #f0f6f9; added by Tim */
 }
 
 .error {

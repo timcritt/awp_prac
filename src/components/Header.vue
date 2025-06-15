@@ -13,11 +13,11 @@ const { isAuthenticated } = storeToRefs(sessionStore);
 		<p>
 			<span class="logo">{{ ICONS.frisbee }}</span> KwikPost
 		</p>
-
+		<!-- We can use $router in the template without importing useRoute -->
 		<button
 			v-if="isAuthenticated"
 			class="btn new-post btn--circle"
-			@click="$router.push('/post/form/1')"
+			@click="$router.push('/post/form/')"
 		>
 			{{ ICONS.edit }}
 		</button>

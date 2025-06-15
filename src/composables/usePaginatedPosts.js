@@ -1,10 +1,16 @@
 import { ref, computed } from "vue";
 
-//Encapsulates the logic for fetching paginated posts
+// Composable to handle paginated posts fetching
+// Arguments: fetchFunction - The function to call for fetching posts.
+// Returns:  1. fetchPaginatedPosts function that can be called with dynamic arguments.
+//           2. reactive properties and methods for managing pagination.
 
-export function usePaginatedPosts(fetchFunction, fetchArgs = []) {
+//Lesson learned:
+//     Bad: Pass the args of fetchFunction to usePaginatedPosts on instantiation of the composable -> Can lead to stale state/closure
+//     Good: Pass the args to fetchPaginatedPosts when you call it at the component level-> latest value used!
+
+export function usePaginatedPosts(fetchFunction) {
 	const posts = ref([]);
-	//Could be extended to accept custom limit, but PRAC specifies limit=10 for all views that consume the composabl
 	const offset = ref(0);
 	const limit = 10;
 	const total = ref(0);
@@ -13,16 +19,17 @@ export function usePaginatedPosts(fetchFunction, fetchArgs = []) {
 
 	const canLoadMore = computed(() => posts.value.length < total.value);
 
-	const fetchPosts = async () => {
+	const fetchPaginatedPosts = async (...args) => {
 		loading.value = true;
 		try {
 			const { paginator, result } = await fetchFunction(
 				offset.value,
 				limit,
-				//spread the fetchArgs to allow for additional parameters
-				...fetchArgs
+				...args // dynamic call args!
 			);
+			//Append new posts to the existing list
 			posts.value.push(...result);
+			//Update total count and offset for next fetch
 			total.value = paginator.total;
 			offset.value += limit;
 		} catch (err) {
@@ -37,6 +44,6 @@ export function usePaginatedPosts(fetchFunction, fetchArgs = []) {
 		loading,
 		error,
 		canLoadMore,
-		fetchPosts,
+		fetchPaginatedPosts,
 	};
 }

@@ -34,14 +34,17 @@ defineProps({
 		<div v-for="post in posts" class="post">
 			<Post
 				:key="post.id"
+				:id="post.id"
 				:name="post.user?.name"
 				:surname="post.user?.surname"
 				:username="post.user?.username"
 				:avatar="post.user?.profileImg"
 				:publishDate="post.publishDate"
 				:content="post.content"
-				:likes="post.nLikes"
-				:replies="post.nReplies"
+				:nLikes="post.nLikes"
+				:nReplies="post.nReplies"
+				:replies="post.replies"
+				:postId="post.postId"
 			/>
 		</div>
 	</div>

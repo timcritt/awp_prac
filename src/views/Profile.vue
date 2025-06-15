@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted } from "vue";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 
 // Import fetch function and pagination composable for fetching posts
 import { fetchPostsByUsername } from "@/services/post-service";
@@ -15,28 +15,43 @@ import { useSessionStore } from "@/stores/session";
 // Import user service to fetch user data associated with the profile
 import { fetchUser } from "@/services/user-service";
 
+// Import icons for the logout button
+import { ICONS } from "@/assets/icons";
+
+import { ROUTES } from "@/router/route-definitions";
+
 const sessionStore = useSessionStore();
 
 // Logout function to clear session and redirect to login
 const { logout } = sessionStore;
 
 const route = useRoute();
+
 const profileUsername = route.params.username;
+
+const router = useRouter();
 
 const userData = ref(null);
 
 // Fetch posts associated with the profile username
-const { posts, loading, error, canLoadMore, fetchPosts } = usePaginatedPosts(
-	fetchPostsByUsername,
-	[profileUsername]
-);
+const { posts, loading, error, canLoadMore, fetchPaginatedPosts } =
+	usePaginatedPosts(fetchPostsByUsername);
 
 onMounted(async () => {
 	userData.value = await fetchUser(profileUsername);
 	console.log("User fetched:", userData);
-	await fetchPosts();
+	await fetchPaginatedPosts(profileUsername);
 	console.log("Posts fetched:", posts);
 });
+
+async function handleLogout() {
+	try {
+		await logout();
+		router.push(ROUTES.LOGIN.to);
+	} catch (error) {
+		console.error("Logout failed:", error);
+	}
+}
 </script>
 
 <template>
@@ -54,10 +69,18 @@ onMounted(async () => {
 				Joined in <time>{{ userData.registrationDate }}</time>
 			</p>
 
-			<button class="btn--logout" @click="logout">Logout</button>
+			<button class="btn btn--circle btn--logout" @click="handleLogout">
+				{{ ICONS.logout }}
+			</button>
 		</div>
-
-		<PostList :posts :loading :canLoadMore :error :fetchPosts />
+		<!-- fetchPosts must be passed with profileUsername to allow for more posts to be loaded on click of button-->
+		<PostList
+			:posts
+			:loading
+			:canLoadMore
+			:error
+			:fetchPosts="() => fetchPaginatedPosts(profileUsername)"
+		/>
 
 		<div v-if="loading && posts.length === 0">Loading...</div>
 		<div v-else-if="error">{{ error }}</div>

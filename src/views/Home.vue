@@ -4,13 +4,11 @@ import { usePaginatedPosts } from "@/composables/usePaginatedPosts";
 import { fetchAllPosts } from "@/services/post-service";
 import { onMounted } from "vue";
 
-const { posts, loading, error, canLoadMore, fetchPosts } = usePaginatedPosts(
-	fetchAllPosts,
-	[]
-);
+const { posts, loading, error, canLoadMore, fetchPaginatedPosts } =
+	usePaginatedPosts(fetchAllPosts, []);
 
 onMounted(async () => {
-	await fetchPosts();
+	await fetchPaginatedPosts();
 	console.log("Posts fetched:", posts);
 });
 </script>
@@ -19,7 +17,13 @@ onMounted(async () => {
 	<div class="home">
 		<h1 class="title-section">Feed</h1>
 
-		<PostList :posts :loading :canLoadMore :error :fetchPosts />
+		<PostList
+			:posts
+			:loading
+			:canLoadMore
+			:error
+			:fetchPosts="fetchPaginatedPosts"
+		/>
 
 		<!-- Load more button -->
 	</div>
